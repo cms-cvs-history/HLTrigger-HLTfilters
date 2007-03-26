@@ -1,0 +1,6 @@
+	module hltHighLevel = HLTHighLevel {
+		vstring HLTPaths = { }
+		bool andOr       = true
+		bool byName      = true
+		InputTag TriggerResultsTag = TriggerResults
+	}
