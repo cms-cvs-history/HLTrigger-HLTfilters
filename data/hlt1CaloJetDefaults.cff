@@ -1,0 +1,6 @@
+block hlt1CaloJetDefaults={
+    InputTag inputTag = iterativeCone5CaloJets
+    double MinPt = 100.0
+    double MaxEta= 5.0
+    int32  MinN  = 1
+}

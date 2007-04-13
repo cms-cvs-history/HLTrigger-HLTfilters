@@ -1,6 +1,5 @@
-	module hlt1CaloJet = HLT1CaloJet {
-		InputTag inputTag = iterativeCone5CaloJets
-		double MinPt = 100.0
-		double MaxEta= 5.0
-		int32  MinN  = 1
-	}
+include "HLTrigger/HLTexample/data/hlt1CaloJetDefaults.cff"
+#
+module hlt1CaloJet = HLT1CaloJet {
+    using hlt1CaloJetDefaults
+}
