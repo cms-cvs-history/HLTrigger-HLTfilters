@@ -1,4 +1,4 @@
-include "HLTrigger/HLTexample/data/hlt1CaloJetDefaults.cff"
+include "HLTrigger/HLTfilters/data/hlt1CaloJetDefaults.cff"
 #
 module hlt1CaloJet = HLT1CaloJet {
     using hlt1CaloJetDefaults
