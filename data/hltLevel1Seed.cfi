@@ -2,7 +2,7 @@
 		vstring L1Seeds = { }
 		bool andOr      = true
 		bool byName     = true
-		InputTag L1ExtraCollections = l1extramctruth  // l1extraParticles
-		InputTag L1ExtraParticleMap = l1extramctruth  // l1extraParticleMap
-		InputTag L1GTReadoutRecord  = l1extramctruth  // l1extraParticleMap (later L1GT emulator)
-}
+		InputTag L1ExtraCollections = l1extraParticles
+		InputTag L1ExtraParticleMap = l1extraParticleMap
+		InputTag L1GTReadoutRecord  = l1extraParticleMap
+	}
