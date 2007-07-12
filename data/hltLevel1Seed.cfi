@@ -1,7 +1,6 @@
 	module hltLevel1Seed = HLTLevel1Seed {
-		vstring L1Seeds = { }
+		vstring L1Seeds = { }       # provide list of L1 triggers you want
 		bool andOr      = true
-		bool byName     = true
 		InputTag L1ExtraCollections = l1extraParticles
 		InputTag L1ExtraParticleMap = l1extraParticleMap
 		InputTag L1GTReadoutRecord  = l1extraParticleMap
