@@ -1,0 +1,27 @@
+
+module hltLevel1GTSeed = HLTLevel1GTSeed {
+
+    // logical expression for the required L1 algorithms;
+    // the algorithms can be given by name or by bit number
+    // allowed operators: "AND", "OR", "NOT", "(", ")"
+    // 
+    string L1SeedsLogicalExpression = ""
+
+    // InputTag for the L1 Global Trigger DAQ readout record
+    //   GT Emulator = l1GtEmulDigis
+    //   GT Unpacker = l1GtUnpack
+    //
+    InputTag L1GtReadoutRecordTag = l1GtEmulDigis
+
+    // InputTag for L1 Global Trigger object maps
+    //   only the emulator produces the object maps
+    //   GT Emulator = l1GtEmulDigis
+    //
+    InputTag L1GtObjectMapTag = l1GtEmulDigis
+
+    // InputTag for L1 particle collections
+    //   L1 Extra = l1extraParticles
+    //
+    InputTag L1CollectionsTag = l1extraParticles
+
+}
