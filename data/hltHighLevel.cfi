@@ -1,5 +1,5 @@
 	module hltHighLevel = HLTHighLevel {
 		vstring HLTPaths = { }     # provide list of HLT paths you want
-		bool andOr       = true
-		InputTag TriggerResultsTag = TriggerResults
+		bool andOr       = true    # true: OR of those on your list 
+		InputTag TriggerResultsTag = TriggerResults::HLT
 	}
