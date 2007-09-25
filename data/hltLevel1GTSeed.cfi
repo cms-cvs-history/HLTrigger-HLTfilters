@@ -2,7 +2,7 @@
 module hltLevel1GTSeed = HLTLevel1GTSeed {
 
     // logical expression for the required L1 algorithms;
-    // the algorithms can be given by name or by bit number
+    // the algorithms are specified by name
     // allowed operators: "AND", "OR", "NOT", "(", ")"
     // 
     string L1SeedsLogicalExpression = ""
