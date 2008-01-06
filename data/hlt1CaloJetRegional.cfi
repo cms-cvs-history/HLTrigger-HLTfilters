@@ -1,0 +1,5 @@
+include "HLTrigger/HLTfilters/data/hlt1CaloJetRegional.cff"
+#
+module hlt1CaloJetRegional = HLT1CaloJet {
+    using hlt1CaloJetRegional
+}

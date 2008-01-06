@@ -1,0 +1,6 @@
+block hlt1CaloJetRegional={
+    InputTag inputTag = iterativeCone5CaloJetsRegional
+    double MinPt = 100.0
+    double MaxEta= 5.0
+    int32  MinN  = 1
+}
