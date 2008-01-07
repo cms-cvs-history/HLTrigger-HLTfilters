@@ -4,6 +4,8 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     // logical expression for the required L1 algorithms;
     // the algorithms are specified by name
     // allowed operators: "AND", "OR", "NOT", "(", ")"
+    //
+    // by convention, "L1GlobalDecision" logical expression means global decision
     // 
     string L1SeedsLogicalExpression = ""
 
