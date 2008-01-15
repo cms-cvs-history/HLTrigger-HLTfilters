@@ -25,5 +25,7 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     //   L1 Extra = l1extraParticles
     //
     InputTag L1CollectionsTag = l1extraParticles
+    // Add a handle to change the muon origin, as needed for the fast simulation
+    InputTag L1MuonCollectionTag = l1extraParticles
 
 }
