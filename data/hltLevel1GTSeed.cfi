@@ -13,7 +13,7 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     //   GT Emulator = l1GtEmulDigis
     //   GT Unpacker = l1GtUnpack
     //
-    InputTag L1GtReadoutRecordTag = l1GtEmulDigis
+    InputTag L1GtReadoutRecordTag = l1GmtEmulDigis
 
     // InputTag for L1 Global Trigger object maps
     //   only the emulator produces the object maps
