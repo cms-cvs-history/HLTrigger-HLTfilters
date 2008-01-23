@@ -4,6 +4,8 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     // logical expression for the required L1 algorithms;
     // the algorithms are specified by name
     // allowed operators: "AND", "OR", "NOT", "(", ")"
+    //
+    // by convention, "L1GlobalDecision" logical expression means global decision
     // 
     string L1SeedsLogicalExpression = ""
 
@@ -11,7 +13,7 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     //   GT Emulator = l1GtEmulDigis
     //   GT Unpacker = l1GtUnpack
     //
-    InputTag L1GtReadoutRecordTag = l1GtEmulDigis
+    InputTag L1GtReadoutRecordTag = l1GmtEmulDigis
 
     // InputTag for L1 Global Trigger object maps
     //   only the emulator produces the object maps
@@ -23,5 +25,7 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     //   L1 Extra = l1extraParticles
     //
     InputTag L1CollectionsTag = l1extraParticles
+    // Add a handle to change the muon origin, as needed for the fast simulation
+    InputTag L1MuonCollectionTag = l1extraParticles
 
 }
