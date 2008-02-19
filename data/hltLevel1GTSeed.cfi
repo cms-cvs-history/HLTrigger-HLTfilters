@@ -13,6 +13,7 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     //   GT Emulator = l1GtEmulDigis
     //   GT Unpacker = l1GtUnpack
     //
+    //   FIXME TEMPORARY: l1GmtEmulDigis - cloned GT unpacker 
     InputTag L1GtReadoutRecordTag = l1GmtEmulDigis
 
     // InputTag for L1 Global Trigger object maps
@@ -21,11 +22,12 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     //
     InputTag L1GtObjectMapTag = l1GtEmulDigis
 
-    // InputTag for L1 particle collections
+    // InputTag for L1 particle collections (except muon)
     //   L1 Extra = l1extraParticles
     //
     InputTag L1CollectionsTag = l1extraParticles
-    // Add a handle to change the muon origin, as needed for the fast simulation
+    
+    // InputTag for L1 muon collection
     InputTag L1MuonCollectionTag = l1extraParticles
 
 }
