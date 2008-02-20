@@ -13,14 +13,16 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     //   GT Emulator = l1GtEmulDigis
     //   GT Unpacker = l1GtUnpack
     //
-    //   FIXME TEMPORARY: l1GmtEmulDigis - cloned GT unpacker 
-    InputTag L1GtReadoutRecordTag = l1GmtEmulDigis
+    //   cloned GT unpacker in HLT = gtDigis
+    InputTag L1GtReadoutRecordTag = gtDigis
 
     // InputTag for L1 Global Trigger object maps
     //   only the emulator produces the object maps
     //   GT Emulator = l1GtEmulDigis
     //
-    InputTag L1GtObjectMapTag = l1GtEmulDigis
+    //   cloned GT emulator in HLT = l1GtObjectMap
+    //
+    InputTag L1GtObjectMapTag = l1GtObjectMap
 
     // InputTag for L1 particle collections (except muon)
     //   L1 Extra = l1extraParticles
