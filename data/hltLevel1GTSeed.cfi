@@ -10,7 +10,7 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
     string L1SeedsLogicalExpression = ""
 
     // InputTag for the L1 Global Trigger DAQ readout record
-    //   GT Emulator = l1GtEmulDigis
+    //   GT Emulator = gtDigis
     //   GT Unpacker = l1GtUnpack
     //
     //   cloned GT unpacker in HLT = gtDigis
@@ -18,7 +18,7 @@ module hltLevel1GTSeed = HLTLevel1GTSeed {
 
     // InputTag for L1 Global Trigger object maps
     //   only the emulator produces the object maps
-    //   GT Emulator = l1GtEmulDigis
+    //   GT Emulator = gtDigis
     //
     //   cloned GT emulator in HLT = l1GtObjectMap
     //
