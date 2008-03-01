@@ -1,4 +1,4 @@
-block hlt1CaloJetRegional={
+block hlt1CaloJetRegionalDefaults={
     InputTag inputTag = iterativeCone5CaloJetsRegional
     double MinPt = 100.0
     double MaxEta= 5.0
