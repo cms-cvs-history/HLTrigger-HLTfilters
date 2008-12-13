@@ -1,6 +1,0 @@
-	module hlt1CaloMET = HLT1CaloMET {
-		InputTag inputTag = met
-		double MinPt = 100.0
-		double MaxEta= -1.0 // negative = no cut
-		int32  MinN  = 1
-	}

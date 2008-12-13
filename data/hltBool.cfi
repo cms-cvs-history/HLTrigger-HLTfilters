@@ -1,3 +1,0 @@
-	module hltBool = HLTBool {
-		bool result = false
-	}
