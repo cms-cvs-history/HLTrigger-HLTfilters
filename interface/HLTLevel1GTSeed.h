@@ -140,6 +140,10 @@ private:
     edm::InputTag m_l1ForJetTag;
     edm::InputTag m_l1TauJetTag;
 
+    /// use the cache service ?
+    bool m_useCacheService;
+    unsigned int m_cacheId;
+
     /// Whether to save these tags
     bool saveTags_;
 };

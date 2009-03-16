@@ -18,6 +18,7 @@
 
 // this class header
 #include "HLTrigger/HLTfilters/interface/HLTLevel1GTSeed.h"
+#include "HLTrigger/HLTfilters/interface/HLTLevel1GTSeedCache.h"
 
 // system include files
 #include <string>
@@ -73,6 +74,8 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 
+#include "FWCore/ServiceRegistry/interface/Service.h"
+
 // constructors
 HLTLevel1GTSeed::HLTLevel1GTSeed(const edm::ParameterSet& parSet) :
     // seeding done via technical trigger bits, if value is "true"
@@ -101,6 +104,10 @@ HLTLevel1GTSeed::HLTLevel1GTSeed(const edm::ParameterSet& parSet) :
     m_l1CenJetTag ( edm::InputTag(m_l1CollectionsTag.label(), "Central") ),
     m_l1ForJetTag ( edm::InputTag(m_l1CollectionsTag.label(), "Forward") ),
     m_l1TauJetTag ( edm::InputTag(m_l1CollectionsTag.label(), "Tau") ),
+
+    // use the cache service
+    m_useCacheService( parSet.getUntrackedParameter<bool>("useCache", true) ),
+    m_cacheId((unsigned int) -1),
 
     // save tags to TriggerFilterObjectWithRefs
     saveTags_( parSet.getUntrackedParameter<bool>("saveTags", true) )
@@ -147,11 +154,27 @@ HLTLevel1GTSeed::HLTLevel1GTSeed(const edm::ParameterSet& parSet) :
 
     // initialize cached IDs
     m_l1GtMenuCacheID = 0ULL;
-
     m_l1GtTmAlgoCacheID = 0ULL;
     m_l1GtTmTechCacheID = 0ULL;
 
-
+    // check if the cache service is available
+    if (m_useCacheService) {
+      if (edm::Service<HLTLevel1GTSeedCache>().isAvailable()) {
+        edm::ParameterSet pset;
+        pset.addParameter("l1GtReadoutRecordTag", m_l1GtReadoutRecordTag);
+        pset.addParameter("l1GtObjectMapTag",     m_l1GtObjectMapTag);
+        pset.addParameter("l1MuonTag",            m_l1MuonTag);
+        pset.addParameter("l1IsoEGTag",           m_l1IsoEGTag);
+        pset.addParameter("l1NoIsoEGTag",         m_l1NoIsoEGTag);
+        pset.addParameter("l1CenJetTag",          m_l1CenJetTag);
+        pset.addParameter("l1ForJetTag",          m_l1ForJetTag);
+        pset.addParameter("l1TauJetTag",          m_l1TauJetTag);
+        pset.addParameter("l1ExtraTag",           m_l1ExtraTag);
+        m_cacheId = edm::Service<HLTLevel1GTSeedCache>()->registerConfiguration( pset );
+      } else {
+        m_useCacheService = false;
+      }
+    }
 }
 
 // destructor
@@ -167,6 +190,14 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
     // recording any reconstructed physics objects satisfying
     // this HLT filter, and place it in the event.
 
+    HLTLevel1GTSeedCache * cache = 0;
+    if (m_useCacheService) {
+      cache = & * edm::Service<HLTLevel1GTSeedCache>();     // sigh
+      if (not cache->loadEvent(iEvent))
+        // failed to load the current Event, temporarily disable caching
+        cache = 0;
+    }
+  
     // the filter object
     std::auto_ptr<trigger::TriggerFilterObjectWithRefs> filterObject (
         new trigger::TriggerFilterObjectWithRefs( path(), module() ) );
@@ -182,7 +213,11 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
 
     // get L1GlobalTriggerReadoutRecord and GT decision
     edm::Handle<L1GlobalTriggerReadoutRecord> gtReadoutRecord;
-    iEvent.getByLabel(m_l1GtReadoutRecordTag, gtReadoutRecord);
+    if (cache) {
+      gtReadoutRecord = cache->getL1GtReadoutRecord(m_cacheId);
+    } else {
+      iEvent.getByLabel(m_l1GtReadoutRecordTag, gtReadoutRecord);
+    } 
 
     //
     boost::uint16_t gtFinalOR = gtReadoutRecord->finalOR();
@@ -337,7 +372,11 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
 
     // get handle to object maps (one object map per algorithm)
     edm::Handle<L1GlobalTriggerObjectMapRecord> gtObjectMapRecord;
-    iEvent.getByLabel(m_l1GtObjectMapTag, gtObjectMapRecord);
+    if (cache) {
+      gtObjectMapRecord = cache->getL1GtObjectMapRecord(m_cacheId);
+    } else {
+      iEvent.getByLabel(m_l1GtObjectMapTag, gtObjectMapRecord);
+    }
 
     // loop over the list of required algorithms for seeding
     int iAlgo = -1;
@@ -546,14 +585,15 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
 
     // muon
     if (listMuon.size()) {
-
         edm::Handle<l1extra::L1MuonParticleCollection> l1Muon;
-        iEvent.getByLabel(m_l1MuonTag, l1Muon);
+        if (cache) {
+          l1Muon = cache->getL1Muon(m_cacheId);
+        } else {
+          iEvent.getByLabel(m_l1MuonTag, l1Muon);
+        }
 
         for (std::list<int>::const_iterator itObj = listMuon.begin(); itObj != listMuon.end(); ++itObj) {
-
             filterObject->addObject(trigger::TriggerL1Mu,l1extra::L1MuonParticleRef(l1Muon, *itObj));
-
         }
     }
 
@@ -561,92 +601,92 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
     // EG (isolated)
     if (listIsoEG.size()) {
         edm::Handle<l1extra::L1EmParticleCollection> l1IsoEG;
-        iEvent.getByLabel(m_l1IsoEGTag, l1IsoEG);
+        if (cache) {
+          l1IsoEG = cache->getL1IsoEG(m_cacheId);
+        } else {
+          iEvent.getByLabel(m_l1IsoEGTag, l1IsoEG);
+        }
 
-        for (std::list<int>::const_iterator
-            itObj = listIsoEG.begin(); itObj != listIsoEG.end(); ++itObj) {
-
+        for (std::list<int>::const_iterator itObj = listIsoEG.begin(); itObj != listIsoEG.end(); ++itObj) {
             filterObject->addObject(trigger::TriggerL1IsoEG,l1extra::L1EmParticleRef(l1IsoEG, *itObj));
-
         }
     }
 
     // EG (no isolation)
     if (listNoIsoEG.size()) {
         edm::Handle<l1extra::L1EmParticleCollection> l1NoIsoEG;
-        iEvent.getByLabel(m_l1NoIsoEGTag, l1NoIsoEG);
+        if (cache) {
+          l1NoIsoEG = cache->getL1NoIsoEG(m_cacheId);
+        } else {
+          iEvent.getByLabel(m_l1NoIsoEGTag, l1NoIsoEG);
+        }
 
-        for (std::list<int>::const_iterator
-            itObj = listNoIsoEG.begin(); itObj != listNoIsoEG.end(); ++itObj) {
-
+        for (std::list<int>::const_iterator itObj = listNoIsoEG.begin(); itObj != listNoIsoEG.end(); ++itObj) {
             filterObject->addObject(trigger::TriggerL1NoIsoEG,l1extra::L1EmParticleRef(l1NoIsoEG, *itObj));
-
         }
     }
 
     // central jets
     if (listCenJet.size()) {
         edm::Handle<l1extra::L1JetParticleCollection> l1CenJet;
-        iEvent.getByLabel(m_l1CenJetTag, l1CenJet);
+        if (cache) {
+          l1CenJet = cache->getL1CenJet(m_cacheId);
+        } else {
+          iEvent.getByLabel(m_l1CenJetTag, l1CenJet);
+        }
 
-        for (std::list<int>::const_iterator
-            itObj = listCenJet.begin(); itObj != listCenJet.end(); ++itObj) {
-
+        for (std::list<int>::const_iterator itObj = listCenJet.begin(); itObj != listCenJet.end(); ++itObj) {
             filterObject->addObject(trigger::TriggerL1CenJet,l1extra::L1JetParticleRef(l1CenJet, *itObj));
-
         }
     }
 
     // forward jets
     if (listForJet.size()) {
         edm::Handle<l1extra::L1JetParticleCollection> l1ForJet;
-        iEvent.getByLabel(m_l1ForJetTag, l1ForJet);
+        if (cache) {
+          l1ForJet = cache->getL1ForJet(m_cacheId);
+        } else {
+          iEvent.getByLabel(m_l1ForJetTag, l1ForJet);
+        }
 
-        for (std::list<int>::const_iterator
-            itObj = listForJet.begin(); itObj != listForJet.end(); ++itObj) {
-
+        for (std::list<int>::const_iterator itObj = listForJet.begin(); itObj != listForJet.end(); ++itObj) {
             filterObject->addObject(trigger::TriggerL1ForJet,l1extra::L1JetParticleRef(l1ForJet, *itObj));
-
         }
     }
 
     // tau jets
     if (listTauJet.size()) {
         edm::Handle<l1extra::L1JetParticleCollection> l1TauJet;
-        iEvent.getByLabel(m_l1TauJetTag, l1TauJet);
+        if (cache) {
+          l1TauJet = cache->getL1TauJet(m_cacheId);
+        } else {
+          iEvent.getByLabel(m_l1TauJetTag, l1TauJet);
+        }
 
-        for (std::list<int>::const_iterator itObj = listTauJet.begin();
-            itObj != listTauJet.end(); ++itObj) {
-
+        for (std::list<int>::const_iterator itObj = listTauJet.begin(); itObj != listTauJet.end(); ++itObj) {
             filterObject->addObject(trigger::TriggerL1TauJet,l1extra::L1JetParticleRef(l1TauJet, *itObj));
-
         }
     }
 
     // energy sums
     if (listETM.size() || listETT.size() || listHTT.size()) {
         edm::Handle<l1extra::L1EtMissParticleCollection> l1EnergySums;
-        iEvent.getByLabel(m_l1ExtraTag, l1EnergySums);
+        if (cache) {
+          l1EnergySums = cache->getL1EnergySums(m_cacheId);
+        } else {
+          iEvent.getByLabel(m_l1ExtraTag, l1EnergySums);
+        }
 
-        for (std::list<int>::const_iterator
-            itObj = listETM.begin(); itObj != listETM.end(); ++itObj) {
-
+        for (std::list<int>::const_iterator itObj = listETM.begin(); itObj != listETM.end(); ++itObj) {
             filterObject->addObject(trigger::TriggerL1ETM,l1extra::L1EtMissParticleRef(l1EnergySums, *itObj));
-
         }
 
-        for (std::list<int>::const_iterator
-            itObj = listETT.begin(); itObj != listETT.end(); ++itObj) {
-
+        for (std::list<int>::const_iterator itObj = listETT.begin(); itObj != listETT.end(); ++itObj) {
             filterObject->addObject(trigger::TriggerL1ETT,l1extra::L1EtMissParticleRef(l1EnergySums, *itObj));
-
         }
 
-        for (std::list<int>::const_iterator
-            itObj = listHTT.begin(); itObj != listHTT.end(); ++itObj) {
-
+        for (std::list<int>::const_iterator itObj = listHTT.begin(); itObj != listHTT.end(); ++itObj) {
             filterObject->addObject(trigger::TriggerL1HTT,l1extra::L1EtMissParticleRef(l1EnergySums, *itObj));
-
         }
 
     }
