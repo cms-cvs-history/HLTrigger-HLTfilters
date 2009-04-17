@@ -14,12 +14,16 @@
  *
  * \author: Andrea Bocci - Università di Pisa, INFN Sez. di Pisa, and CERN
  *
- * $Date$
- * $Revision$
+ * $Date: 2009/03/16 09:45:51 $
+ * $Revision: 1.1.2.1 $
  *
  */
 
+// FIXME: ugly hack
+#define private public
 #include "FWCore/Framework/interface/Event.h"
+#undef private
+
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
@@ -92,70 +96,62 @@ bool HLTLevel1GTSeedCache::loadEvent(const edm::Event & event) {
     // raise an exception ?
     return false;
   }
-  if (m_event) {
-    // event already set, nothing to do
-    return true;  
+
+  if (m_event == 0) { 
+    // this is the first time we are called for this event, fill the cache
+    for (unsigned int i = 0; i < m_cache.size(); ++i) {
+      event.Base::getByLabel(m_configuration[i].l1GtReadoutRecordTag,   m_cache[i].l1GtReadoutRecord);
+      event.Base::getByLabel(m_configuration[i].l1GtObjectMapRecordTag, m_cache[i].l1GtObjectMapRecord);
+      event.Base::getByLabel(m_configuration[i].l1MuonTag,              m_cache[i].l1Muon);
+      event.Base::getByLabel(m_configuration[i].l1IsoEGTag,             m_cache[i].l1IsoEG);
+      event.Base::getByLabel(m_configuration[i].l1NoIsoEGTag,           m_cache[i].l1NoIsoEG);
+      event.Base::getByLabel(m_configuration[i].l1CenJetTag,            m_cache[i].l1CenJet);
+      event.Base::getByLabel(m_configuration[i].l1ForJetTag,            m_cache[i].l1ForJet);
+      event.Base::getByLabel(m_configuration[i].l1TauJetTag,            m_cache[i].l1TauJet);
+      event.Base::getByLabel(m_configuration[i].l1ExtraTag,             m_cache[i].l1EnergySums);
+    }
   }
-  // this is the first time we are called for this event, fill the cache
+
+  // keep track of the current Event
   m_event = & event;
-  for (unsigned int i = 0; i < m_cache.size(); ++i) {
-    event.getByLabel(m_configuration[i].l1GtReadoutRecordTag,   m_cache[i].l1GtReadoutRecord);
-    event.getByLabel(m_configuration[i].l1GtObjectMapRecordTag, m_cache[i].l1GtObjectMapRecord);
-    event.getByLabel(m_configuration[i].l1MuonTag,              m_cache[i].l1Muon);
-    event.getByLabel(m_configuration[i].l1IsoEGTag,             m_cache[i].l1IsoEG);
-    event.getByLabel(m_configuration[i].l1NoIsoEGTag,           m_cache[i].l1NoIsoEG);
-    event.getByLabel(m_configuration[i].l1CenJetTag,            m_cache[i].l1CenJet);
-    event.getByLabel(m_configuration[i].l1ForJetTag,            m_cache[i].l1ForJet);
-    event.getByLabel(m_configuration[i].l1TauJetTag,            m_cache[i].l1TauJet);
-    event.getByLabel(m_configuration[i].l1ExtraTag,             m_cache[i].l1EnergySums);
-  }
   return true;
 }
 
-/// access the content of the cache (pass cahceId to identify the configuration)
+
 const edm::Handle<L1GlobalTriggerReadoutRecord> & HLTLevel1GTSeedCache::getL1GtReadoutRecord(unsigned int cacheId) const {
-  static edm::Handle<L1GlobalTriggerReadoutRecord> invalidHandle;
-  return (cacheId < m_cache.size()) ? m_cache[cacheId].l1GtReadoutRecord : invalidHandle;
+  return get(cacheId, & Cache::l1GtReadoutRecord); 
 }
 
 const edm::Handle<L1GlobalTriggerObjectMapRecord> & HLTLevel1GTSeedCache::getL1GtObjectMapRecord(unsigned int cacheId) const {
-  static edm::Handle<L1GlobalTriggerObjectMapRecord> invalidHandle;
-  return (cacheId < m_cache.size()) ? m_cache[cacheId].l1GtObjectMapRecord : invalidHandle;
+  return get(cacheId, & Cache::l1GtObjectMapRecord);
 }
 
 const edm::Handle<l1extra::L1MuonParticleCollection> & HLTLevel1GTSeedCache::getL1Muon(unsigned int cacheId) const {
-  static edm::Handle<l1extra::L1MuonParticleCollection> invalidHandle;
-  return (cacheId < m_cache.size()) ? m_cache[cacheId].l1Muon : invalidHandle;
+  return get(cacheId, & Cache::l1Muon);
 }
 
 const edm::Handle<l1extra::L1EmParticleCollection> & HLTLevel1GTSeedCache::getL1IsoEG(unsigned int cacheId) const {
-  static edm::Handle<l1extra::L1EmParticleCollection> invalidHandle;
-  return (cacheId < m_cache.size()) ? m_cache[cacheId].l1IsoEG : invalidHandle;
+  return get(cacheId, & Cache::l1IsoEG);
 }
 
 const edm::Handle<l1extra::L1EmParticleCollection> & HLTLevel1GTSeedCache::getL1NoIsoEG(unsigned int cacheId) const {
-  static edm::Handle<l1extra::L1EmParticleCollection> invalidHandle;
-  return (cacheId < m_cache.size()) ? m_cache[cacheId].l1NoIsoEG : invalidHandle;
+  return get(cacheId, & Cache::l1NoIsoEG);
 }
 
 const edm::Handle<l1extra::L1JetParticleCollection> & HLTLevel1GTSeedCache::getL1CenJet(unsigned int cacheId) const {
-  static edm::Handle<l1extra::L1JetParticleCollection> invalidHandle;
-  return (cacheId < m_cache.size()) ? m_cache[cacheId].l1CenJet : invalidHandle;
+  return get(cacheId, & Cache::l1CenJet);
 }
 
 const edm::Handle<l1extra::L1JetParticleCollection> & HLTLevel1GTSeedCache::getL1ForJet(unsigned int cacheId) const {
-  static edm::Handle<l1extra::L1JetParticleCollection> invalidHandle;
-  return (cacheId < m_cache.size()) ? m_cache[cacheId].l1ForJet : invalidHandle;
+  return get(cacheId, & Cache::l1ForJet);
 }
 
 const edm::Handle<l1extra::L1JetParticleCollection> & HLTLevel1GTSeedCache::getL1TauJet(unsigned int cacheId) const {
-  static edm::Handle<l1extra::L1JetParticleCollection> invalidHandle;
-  return (cacheId < m_cache.size()) ? m_cache[cacheId].l1TauJet : invalidHandle;
+  return get(cacheId, & Cache::l1TauJet);
 }
 
 const edm::Handle<l1extra::L1EtMissParticleCollection> & HLTLevel1GTSeedCache::getL1EnergySums(unsigned int cacheId) const {
-  static edm::Handle<l1extra::L1EtMissParticleCollection> invalidHandle;
-  return (cacheId < m_cache.size()) ? m_cache[cacheId].l1EnergySums : invalidHandle;
+  return get(cacheId, & Cache::l1EnergySums);
 }
 
 // declare this as a simple EDM Service

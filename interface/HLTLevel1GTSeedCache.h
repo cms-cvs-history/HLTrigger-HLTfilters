@@ -17,8 +17,8 @@
  *
  * \author: Andrea Bocci - Università di Pisa, INFN Sez. di Pisa, and CERN
  *
- * $Date$
- * $Revision$
+ * $Date: 2009/03/16 09:45:51 $
+ * $Revision: 1.1.2.1 $
  *
  */
 
@@ -108,6 +108,23 @@ private:
     edm::EventID                    m_eventId;
     std::vector<CacheConfiguration> m_configuration;
     std::vector<Cache>              m_cache;
+
+    /// access the content of the cache (pass cahceId to identify the configuration)
+    template <typename T>
+    const edm::Handle<T> & get(unsigned int cacheId, edm::Handle<T> (Cache::*entry) ) const {
+      const static edm::Handle<T> invalidHandle;
+      if (cacheId < m_cache.size()) {
+        // retrieve the Handle from the cache
+        const edm::Handle<T> & handle = m_cache[cacheId].*entry;
+        if (handle.isValid())
+          // track the provenance of this collection
+          m_event->addToGotBranchIDs( * handle.provenance() );
+        return handle;
+      } else {
+        return invalidHandle;
+      }
+    }
+
 };
 
 #endif // HLTfilters_HLTLevel1GTSeedCache_h

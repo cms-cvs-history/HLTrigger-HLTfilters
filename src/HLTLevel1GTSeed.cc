@@ -22,7 +22,6 @@
 
 // system include files
 #include <string>
-#include <list>
 #include <vector>
 #include <algorithm>
 
@@ -354,21 +353,16 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
     }
 
     // define index lists for all particle types
-
-    std::list<int> listMuon;
-
-    std::list<int> listIsoEG;
-    std::list<int> listNoIsoEG;
-
-    std::list<int> listCenJet;
-    std::list<int> listForJet;
-    std::list<int> listTauJet;
-
-    std::list<int> listETM;
-    std::list<int> listETT;
-    std::list<int> listHTT;
-
-    std::list<int> listJetCounts;
+    std::vector<int> listMuon;
+    std::vector<int> listIsoEG;
+    std::vector<int> listNoIsoEG;
+    std::vector<int> listCenJet;
+    std::vector<int> listForJet;
+    std::vector<int> listTauJet;
+    std::vector<int> listETM;
+    std::vector<int> listETT;
+    std::vector<int> listHTT;
+    //std::vector<int> listJetCounts;
 
     // get handle to object maps (one object map per algorithm)
     edm::Handle<L1GlobalTriggerObjectMapRecord> gtObjectMapRecord;
@@ -388,7 +382,7 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
         iAlgo++;
         //
         int algBit = (*itSeed).tokenNumber;
-        std::string algName = (*itSeed).tokenName;
+        const std::string & algName = (*itSeed).tokenName;
         bool algResult = (*itSeed).tokenResult;
 
         //LogTrace("HLTLevel1GTSeed")
@@ -446,7 +440,7 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
         for (std::vector<L1GtLogicParser::OperandToken>::const_iterator
             itCond = condSeeds.begin(); itCond != condSeeds.end(); itCond++) {
 
-            std::string cndName = (*itCond).tokenName;
+            const std::string & cndName = (*itCond).tokenName;
             int cndNumber = (*itCond).tokenNumber;
             bool cndResult = (*itCond).tokenResult;
 
@@ -534,7 +528,7 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
 
                             break;
                         case JetCounts: {
-                                listJetCounts.push_back(*itObject);
+                                // listJetCounts.push_back(*itObject);
                             }
 
                             break;
@@ -557,27 +551,26 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
 
     // eliminate duplicates
 
-    listMuon.sort();
+    std::sort(listMuon.begin(), listMuon.end());
     listMuon.unique();
 
-    listIsoEG.sort();
+    std::sort(listIsoEG.begin(), listIsoEG.end());
     listIsoEG.unique();
 
-    listNoIsoEG.sort();
+    std::sort(listNoIsoEG.begin(), listNoIsoEG.end());
     listNoIsoEG.unique();
 
-    listCenJet.sort();
+    std::sort(listCenJet.begin(), listCenJet.end());
     listCenJet.unique();
 
-    listForJet.sort();
+    std::sort(listForJet.begin(), listForJet.end());
     listForJet.unique();
 
-    listTauJet.sort();
+    std::sort(listTauJet.begin(), listTauJet.end());
     listTauJet.unique();
 
     // no need to eliminate duplicates for energy sums and jet counts
     // they are global quantities
-
 
     //
     // record the L1 physics objects in the HLT filterObject
@@ -592,8 +585,8 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
           iEvent.getByLabel(m_l1MuonTag, l1Muon);
         }
 
-        for (std::list<int>::const_iterator itObj = listMuon.begin(); itObj != listMuon.end(); ++itObj) {
-            filterObject->addObject(trigger::TriggerL1Mu,l1extra::L1MuonParticleRef(l1Muon, *itObj));
+        for (std::vector<int>::const_iterator itObj = listMuon.begin(), itEnd = std::unique(listMuon.begin(), listMuon.end()); itObj != itEnd; ++itObj) {
+            filterObject->addObject(trigger::TriggerL1Mu, l1extra::L1MuonParticleRef(l1Muon, *itObj));
         }
     }
 
@@ -607,8 +600,8 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
           iEvent.getByLabel(m_l1IsoEGTag, l1IsoEG);
         }
 
-        for (std::list<int>::const_iterator itObj = listIsoEG.begin(); itObj != listIsoEG.end(); ++itObj) {
-            filterObject->addObject(trigger::TriggerL1IsoEG,l1extra::L1EmParticleRef(l1IsoEG, *itObj));
+        for (std::vector<int>::const_iterator itObj = listIsoEG.begin(), itEnd = std::unique(listIsoEG.begin(), listIsoEG.end()); itObj != itEnd; ++itObj) {
+            filterObject->addObject(trigger::TriggerL1IsoEG, l1extra::L1EmParticleRef(l1IsoEG, *itObj));
         }
     }
 
@@ -621,8 +614,8 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
           iEvent.getByLabel(m_l1NoIsoEGTag, l1NoIsoEG);
         }
 
-        for (std::list<int>::const_iterator itObj = listNoIsoEG.begin(); itObj != listNoIsoEG.end(); ++itObj) {
-            filterObject->addObject(trigger::TriggerL1NoIsoEG,l1extra::L1EmParticleRef(l1NoIsoEG, *itObj));
+        for (std::vector<int>::const_iterator itObj = listNoIsoEG.begin(), itEnd = std::unique(listNoIsoEG.begin(), listNoIsoEG.end()); itObj != itEnd; ++itObj) {
+            filterObject->addObject(trigger::TriggerL1NoIsoEG, l1extra::L1EmParticleRef(l1NoIsoEG, *itObj));
         }
     }
 
@@ -635,8 +628,8 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
           iEvent.getByLabel(m_l1CenJetTag, l1CenJet);
         }
 
-        for (std::list<int>::const_iterator itObj = listCenJet.begin(); itObj != listCenJet.end(); ++itObj) {
-            filterObject->addObject(trigger::TriggerL1CenJet,l1extra::L1JetParticleRef(l1CenJet, *itObj));
+        for (std::vector<int>::const_iterator itObj = listCenJet.begin(), itEnd = std::unique(listCenJet.begin(), listCenJet.end()); itObj != itEnd; ++itObj) {
+            filterObject->addObject(trigger::TriggerL1CenJet, l1extra::L1JetParticleRef(l1CenJet, *itObj));
         }
     }
 
@@ -649,8 +642,8 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
           iEvent.getByLabel(m_l1ForJetTag, l1ForJet);
         }
 
-        for (std::list<int>::const_iterator itObj = listForJet.begin(); itObj != listForJet.end(); ++itObj) {
-            filterObject->addObject(trigger::TriggerL1ForJet,l1extra::L1JetParticleRef(l1ForJet, *itObj));
+        for (std::vector<int>::const_iterator itObj = listForJet.begin(), itEnd = std::unique(listForJet.begin(), listForJet.end()); itObj != itEnd; ++itObj) {
+            filterObject->addObject(trigger::TriggerL1ForJet, l1extra::L1JetParticleRef(l1ForJet, *itObj));
         }
     }
 
@@ -663,8 +656,8 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
           iEvent.getByLabel(m_l1TauJetTag, l1TauJet);
         }
 
-        for (std::list<int>::const_iterator itObj = listTauJet.begin(); itObj != listTauJet.end(); ++itObj) {
-            filterObject->addObject(trigger::TriggerL1TauJet,l1extra::L1JetParticleRef(l1TauJet, *itObj));
+        for (std::vector<int>::const_iterator itObj = listTauJet.begin(), itEnd = std::unique(listTauJet.begin(), listTauJet.end()); itObj != itEnd; ++itObj) {
+            filterObject->addObject(trigger::TriggerL1TauJet, l1extra::L1JetParticleRef(l1TauJet, *itObj));
         }
     }
 
@@ -677,16 +670,16 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
           iEvent.getByLabel(m_l1ExtraTag, l1EnergySums);
         }
 
-        for (std::list<int>::const_iterator itObj = listETM.begin(); itObj != listETM.end(); ++itObj) {
-            filterObject->addObject(trigger::TriggerL1ETM,l1extra::L1EtMissParticleRef(l1EnergySums, *itObj));
+        for (std::vector<int>::const_iterator itObj = listETM.begin(), itEnd = std::unique(listETM.begin(), listETM.end()); itObj != itEnd; ++itObj) {
+            filterObject->addObject(trigger::TriggerL1ETM, l1extra::L1EtMissParticleRef(l1EnergySums, *itObj));
         }
 
-        for (std::list<int>::const_iterator itObj = listETT.begin(); itObj != listETT.end(); ++itObj) {
-            filterObject->addObject(trigger::TriggerL1ETT,l1extra::L1EtMissParticleRef(l1EnergySums, *itObj));
+        for (std::vector<int>::const_iterator itObj = listETT.begin(), itEnd = std::unique(listETT.begin(), listETT.end()); itObj != itEnd; ++itObj) {
+            filterObject->addObject(trigger::TriggerL1ETT, l1extra::L1EtMissParticleRef(l1EnergySums, *itObj));
         }
 
-        for (std::list<int>::const_iterator itObj = listHTT.begin(); itObj != listHTT.end(); ++itObj) {
-            filterObject->addObject(trigger::TriggerL1HTT,l1extra::L1EtMissParticleRef(l1EnergySums, *itObj));
+        for (std::vector<int>::const_iterator itObj = listHTT.begin(), itEnd = std::unique(listHTT.begin(), listHTT.end()); itObj != itEnd; ++itObj) {
+            filterObject->addObject(trigger::TriggerL1HTT, l1extra::L1EtMissParticleRef(l1EnergySums, *itObj));
         }
 
     }
@@ -702,7 +695,7 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
     //        for (std::list<int>::const_iterator itObj = listJetCounts.begin();
     //                itObj != listJetCounts.end(); ++itObj) {
     //
-    //            filterObject->addObject(trigger::TriggerL1JetCounts,l1extra::L1JetCountsRefProd(l1JetCounts));
+    //            filterObject->addObject(trigger::TriggerL1JetCounts, l1extra::L1JetCountsRefProd(l1JetCounts));
     //                  // FIXME: RefProd!
     //
     //        }
@@ -949,7 +942,7 @@ void HLTLevel1GTSeed::updateAlgoLogicParser(const L1GtTriggerMenu* l1GtMenu) {
 
                     for (size_t opI = 0; opI < aRpnVectorSize; ++opI) {
 
-                        std::string cName = (aRpnVector[opI]).operand;
+                        const std::string & cName = (aRpnVector[opI]).operand;
 
                         if (!cName.empty()) {
 
@@ -1057,7 +1050,7 @@ void HLTLevel1GTSeed::convertStringToBitNumber() {
 
     for (size_t i = 0; i < algOpTokenVector.size(); ++i) {
 
-        std::string bitString = (algOpTokenVector[i]).tokenName;
+        const std::string & bitString = (algOpTokenVector[i]).tokenName;
         std::istringstream bitStream(bitString);
         int bitInt;
 
@@ -1076,7 +1069,7 @@ void HLTLevel1GTSeed::convertStringToBitNumber() {
 
     for (size_t i = 0; i < m_l1AlgoSeeds.size(); ++i) {
 
-        std::string bitString = (m_l1AlgoSeeds[i]).tokenName;
+        const std::string & bitString = (m_l1AlgoSeeds[i]).tokenName;
         std::istringstream bitStream(bitString);
         int bitInt;
 
