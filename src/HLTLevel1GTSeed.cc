@@ -549,31 +549,16 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
 
     }
 
-    // eliminate duplicates
-
+    // sort the collection
     std::sort(listMuon.begin(), listMuon.end());
-    listMuon.unique();
-
     std::sort(listIsoEG.begin(), listIsoEG.end());
-    listIsoEG.unique();
-
     std::sort(listNoIsoEG.begin(), listNoIsoEG.end());
-    listNoIsoEG.unique();
-
     std::sort(listCenJet.begin(), listCenJet.end());
-    listCenJet.unique();
-
     std::sort(listForJet.begin(), listForJet.end());
-    listForJet.unique();
-
     std::sort(listTauJet.begin(), listTauJet.end());
-    listTauJet.unique();
-
-    // no need to eliminate duplicates for energy sums and jet counts
-    // they are global quantities
 
     //
-    // record the L1 physics objects in the HLT filterObject
+    // eliminate duplicates and record the L1 physics objects in the HLT filterObject
     //
 
     // muon
