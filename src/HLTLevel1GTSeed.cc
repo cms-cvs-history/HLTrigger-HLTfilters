@@ -201,13 +201,13 @@ bool HLTLevel1GTSeed::filter(edm::Event& iEvent, const edm::EventSetup& evSetup)
     std::auto_ptr<trigger::TriggerFilterObjectWithRefs> filterObject (
         new trigger::TriggerFilterObjectWithRefs( path(), module() ) );
     if (saveTags_) {
-      filterObject->addCollectionTag( m_l1MuonTag );
-      filterObject->addCollectionTag( m_l1ExtraTag );
-      filterObject->addCollectionTag( m_l1IsoEGTag );
-      filterObject->addCollectionTag( m_l1NoIsoEGTag );
-      filterObject->addCollectionTag( m_l1CenJetTag );
-      filterObject->addCollectionTag( m_l1ForJetTag );
-      filterObject->addCollectionTag( m_l1TauJetTag );
+      filterObject->addCollectionTag(m_l1MuonTag,    static_cast<const HLTFilter &> (*this));
+      filterObject->addCollectionTag(m_l1ExtraTag,   static_cast<const HLTFilter &> (*this));
+      filterObject->addCollectionTag(m_l1IsoEGTag,   static_cast<const HLTFilter &> (*this));
+      filterObject->addCollectionTag(m_l1NoIsoEGTag, static_cast<const HLTFilter &> (*this));
+      filterObject->addCollectionTag(m_l1CenJetTag,  static_cast<const HLTFilter &> (*this));
+      filterObject->addCollectionTag(m_l1ForJetTag,  static_cast<const HLTFilter &> (*this));
+      filterObject->addCollectionTag(m_l1TauJetTag,  static_cast<const HLTFilter &> (*this));
     }
 
     // get L1GlobalTriggerReadoutRecord and GT decision

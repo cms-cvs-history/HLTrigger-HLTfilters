@@ -2,8 +2,8 @@
  *
  * See header file for documentation
  *
- *  $Date: 2008/07/09 13:04:59 $
- *  $Revision: 1.8 $
+ *  $Date: 2008/12/10 07:59:10 $
+ *  $Revision: 1.9 $
  *
  *  \author Martin Grunewald
  *
@@ -89,8 +89,8 @@ HLTDoublet<T1,Tid1,T2,Tid2>::filter(edm::Event& iEvent, const edm::EventSetup& i
      filterobject (new TriggerFilterObjectWithRefs(path(),module()));
    // Don't saveTag the TFOWRs, but rather the collections pointed to!
    //   if (saveTags_) {
-   //     filterobject->addCollectionTag(inputTag1_);
-   //     filterobject->addCollectionTag(inputTag2_);
+   //     filterobject->addCollectionTag(inputTag1_, static_cast<const HLTFilter &> (*this));
+   //     filterobject->addCollectionTag(inputTag2_, static_cast<const HLTFilter &> (*this));
    //   }
    bool accept(false);
 
@@ -114,7 +114,7 @@ HLTDoublet<T1,Tid1,T2,Tid2>::filter(edm::Event& iEvent, const edm::EventSetup& i
 	 const string&  process(iEvent.getProvenance(pid).processName());
 	 InputTag tagNew(InputTag(label,instance,process));
 	 if (tagOld.encode()!=tagNew.encode()) {
-	   filterobject->addCollectionTag(tagNew);
+	   filterobject->addCollectionTag(tagNew, static_cast<const HLTFilter &> (*this));
 	   tagOld=tagNew;
 	 }
        }
@@ -126,7 +126,7 @@ HLTDoublet<T1,Tid1,T2,Tid2>::filter(edm::Event& iEvent, const edm::EventSetup& i
 	 const string&  process(iEvent.getProvenance(pid).processName());
 	 InputTag tagNew(InputTag(label,instance,process));
 	 if (tagOld.encode()!=tagNew.encode()) {
-	   filterobject->addCollectionTag(tagNew);
+	   filterobject->addCollectionTag(tagNew, static_cast<const HLTFilter &> (*this));
 	   tagOld=tagNew;
 	 }
        }

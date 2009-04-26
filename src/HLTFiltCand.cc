@@ -2,8 +2,8 @@
  *
  * See header file for documentation
  *
- *  $Date: 2008/05/05 15:48:34 $
- *  $Revision: 1.11 $
+ *  $Date: 2008/05/09 05:59:22 $
+ *  $Revision: 1.12 $
  *
  *  \author Martin Grunewald
  *
@@ -96,15 +96,15 @@ HLTFiltCand::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    auto_ptr<TriggerFilterObjectWithRefs> 
      filterobject (new TriggerFilterObjectWithRefs(path(),module()));
    if (saveTags_) {
-     filterobject->addCollectionTag(photTag_);
-     filterobject->addCollectionTag(elecTag_);
-     filterobject->addCollectionTag(muonTag_);
-     filterobject->addCollectionTag(tausTag_);
-     filterobject->addCollectionTag(jetsTag_);
-     filterobject->addCollectionTag(metsTag_);
-     filterobject->addCollectionTag(httsTag_);
-     filterobject->addCollectionTag(trckTag_);
-     filterobject->addCollectionTag(ecalTag_);
+     filterobject->addCollectionTag(photTag_, static_cast<const HLTFilter &> (*this));
+     filterobject->addCollectionTag(elecTag_, static_cast<const HLTFilter &> (*this));
+     filterobject->addCollectionTag(muonTag_, static_cast<const HLTFilter &> (*this));
+     filterobject->addCollectionTag(tausTag_, static_cast<const HLTFilter &> (*this));
+     filterobject->addCollectionTag(jetsTag_, static_cast<const HLTFilter &> (*this));
+     filterobject->addCollectionTag(metsTag_, static_cast<const HLTFilter &> (*this));
+     filterobject->addCollectionTag(httsTag_, static_cast<const HLTFilter &> (*this));
+     filterobject->addCollectionTag(trckTag_, static_cast<const HLTFilter &> (*this));
+     filterobject->addCollectionTag(ecalTag_, static_cast<const HLTFilter &> (*this));
    }
 
    // Specific filter code
